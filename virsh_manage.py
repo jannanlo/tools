@@ -20,6 +20,16 @@ class VirshManage(object):
         res = self.subprocess_popen(["virsh", "domstate", str(domain)])
         return res[1].strip()
 
+    def domain_shutdown(self, domain):
+        res = self.subprocess_popen(["virsh", "shutdown", str(domain)])
+        print res[1], res[2]
+        if res[0] > 0 and 'domain is not running' in res[2]:
+            return True
+        else:
+            while 1:
+                if self.domain_state(domain) == 'shut off':
+                    return True
+
     def domain_destroy(self, domain):
         res = self.subprocess_popen(["virsh", "destroy", str(domain)])
         if res[0] == 0 or 'domain is not running' in res[2]:
@@ -72,6 +82,19 @@ class VirshManage(object):
             if self.delete_snapshot(domain, new_item[0]):
                 print "Deleted: ", " ".join(new_item)
 
+    def create_snapshot(self, domain, snapshot_name):
+        res = self.subprocess_popen(["virsh", "snapshot-create-as",
+                                     str(domain), str(snapshot_name)])
+        print res[1], res[2]
+        if res[0] == 0:
+            return True
+        return False
+
+    def create_same_snapshot_name(self, domain_list, snapshot_name):
+        for item in domain_list:
+            if self.domain_shutdown(item):
+                self.create_snapshot(item, snapshot_name)
+
     def delete_domain(self, domain):
         if self.domain_destroy(domain):
             print '=' * 10, 'Deleting: ', domain, '=' * 10
@@ -85,7 +108,8 @@ class VirshManage(object):
 
 
 if __name__ == "__main__":
-    domain_list = ["win7x64", "oxl-rhel65"]
     vm = VirshManage()
-    for a in domain_list:
-        vm.delete_domain(a)
+    domain_list = ['test-rh68-192-168-215-23','test-rh68-192-168-215-24', 'test-rh68-192-168-215-25']
+    # for a in domain_list:
+    #     vm.delete_domain(a)
+    vm.create_same_snapshot_name(domain_list, 'init')
