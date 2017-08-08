@@ -20,15 +20,16 @@ class VirshManage(object):
         res = self.subprocess_popen(["virsh", "domstate", str(domain)])
         return res[1].strip()
 
-    def domain_shutdown(self, domain):
+    def domain_shutdown(self, domain, wait_result=False):
         res = self.subprocess_popen(["virsh", "shutdown", str(domain)])
         print res[1], res[2]
-        if res[0] > 0 and 'domain is not running' in res[2]:
-            return True
-        else:
-            while 1:
-                if self.domain_state(domain) == 'shut off':
-                    return True
+        if wait_result:
+            if res[0] > 0 and 'domain is not running' in res[2]:
+                return True
+            else:
+                while 1:
+                    if self.domain_state(domain) == 'shut off':
+                        return True
 
     def domain_destroy(self, domain):
         res = self.subprocess_popen(["virsh", "destroy", str(domain)])
@@ -92,8 +93,22 @@ class VirshManage(object):
 
     def create_same_snapshot_name(self, domain_list, snapshot_name):
         for item in domain_list:
-            if self.domain_shutdown(item):
+            if self.domain_shutdown(item, True):
                 self.create_snapshot(item, snapshot_name)
+
+    def snapshot_revert(self, domain, snapshot_name, running=True):
+        cmds = ["virsh", "snapshot-revert", str(domain), str(snapshot_name)]
+        if running:
+            cmds.extend(['--running', '--force'])
+        res = self.subprocess_popen(cmds)
+        if res[0] == 0:
+            print '{0} revert to {1}'.format(domain, snapshot_name)
+            return True
+        return False
+
+    def snapshots_revert(self, domain_list, snapshot_name, running=True):
+        for item in domain_list:
+            self.snapshot_revert(item, snapshot_name, running)
 
     def delete_domain(self, domain):
         if self.domain_destroy(domain):
@@ -109,7 +124,10 @@ class VirshManage(object):
 
 if __name__ == "__main__":
     vm = VirshManage()
-    domain_list = ['test-rh68-192-168-215-23','test-rh68-192-168-215-24', 'test-rh68-192-168-215-25']
+    domain_list = ['test-rh68-192-168-215-10','test-rh68-192-168-215-21',
+                   'test-rh68-192-168-215-22','test-rh68-192-168-215-23',
+                   'test-rh68-192-168-215-24', 'test-rh68-192-168-215-25']
     # for a in domain_list:
     #     vm.delete_domain(a)
-    vm.create_same_snapshot_name(domain_list, 'init')
+    # vm.create_same_snapshot_name(domain_list, 'init')
+    vm.snapshots_revert(domain_list, 'init')
