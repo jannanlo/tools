@@ -5,7 +5,6 @@ import re
 
 
 class VirshManage(object):
-
     def __init__(self):
         pass
 
@@ -42,6 +41,17 @@ class VirshManage(object):
         if res[0] == 0 or "Domain not found" in res[2]:
             return True
         return False
+
+    def domain_start(self, domain):
+        res = self.subprocess_popen(["virsh", "start", str(domain)])
+        print res[1], res[2]
+        if res[0] == 0 or "Domain is already active" in res[2]:
+            return True
+        return False
+
+    def domains_start(self, domain_list):
+        for domain in domain_list:
+            self.domain_start(domain)
 
     def is_domain_exist(self, domain):
         res = self.subprocess_popen(["virsh", "domstate", str(domain)])
@@ -122,12 +132,37 @@ class VirshManage(object):
             print '=' * 10, 'Deleted: ', domain, domain, '=' * 10
 
 
-if __name__ == "__main__":
+def vm_in_90():
     vm = VirshManage()
-    domain_list = ['test-rh68-192-168-215-10','test-rh68-192-168-215-21',
-                   'test-rh68-192-168-215-22','test-rh68-192-168-215-23',
-                   'test-rh68-192-168-215-24', 'test-rh68-192-168-215-25']
+    domain_list = [
+        # 'test-rh68-192-168-215-103',
+        # 'test-rh68-192-168-215-104',
+        # 'test-rh68-192-168-215-105',
+        # 'test-rh68-192-168-215-106',
+        'test-rh68-192-168-215-110',
+        'test-rh68-192-168-215-111',
+        'test-rh68-192-168-215-112'
+    ]
+    # domain_list = [
+    #     'test-rh68-192-168-215-116',
+    #     'test-rh68-192-168-215-117',
+    #     'test-rh68-192-168-215-118',
+    #     'test-rh68-192-168-215-119',
+    #     'test-rh68-192-168-215-120',
+    #     'test-rh68-192-168-215-121'
+    # ]
+    # vm.snapshots_revert(domain_list, 'init')
+    # vm.create_same_snapshot_name(domain_list, 'installed-ceph')
+    vm.domains_start(domain_list)
+
+
+if __name__ == "__main__":
+    # vm = VirshManage()
+    # domain_list = ['test-rh68-192-168-215-10','test-rh68-192-168-215-21',
+    #                'test-rh68-192-168-215-22','test-rh68-192-168-215-23',
+    #                'test-rh68-192-168-215-24', 'test-rh68-192-168-215-25']
     # for a in domain_list:
     #     vm.delete_domain(a)
     # vm.create_same_snapshot_name(domain_list, 'init')
-    vm.snapshots_revert(domain_list, 'init')
+    # vm.snapshots_revert(domain_list, 'init')
+    vm_in_90()
