@@ -131,17 +131,22 @@ class VirshManage(object):
                 self.rm_domain_blocks(domain_blocks)
             print '=' * 10, 'Deleted: ', domain, domain, '=' * 10
 
+    def delete_snapshot_in_domains(self, domain_list, snapshot_name):
+        for item in domain_list:
+            print 'delete ', item, ' snapshot ', snapshot_name
+            self.delete_snapshot(item, snapshot_name)
+
 
 def vm_in_90():
     vm = VirshManage()
     domain_list = [
-        # 'test-rh68-192-168-215-103',
-        # 'test-rh68-192-168-215-104',
-        # 'test-rh68-192-168-215-105',
-        # 'test-rh68-192-168-215-106',
-        'test-rh68-192-168-215-110',
-        'test-rh68-192-168-215-111',
-        'test-rh68-192-168-215-112'
+        #    'test-rh68-192-168-215-103',
+        #    'test-rh68-192-168-215-104',
+        #    'test-rh68-192-168-215-105',
+        #    'test-rh68-192-168-215-106',
+        'test-rh68-192-168-215-110',  # installed-ceph   installed-gluster
+        'test-rh68-192-168-215-111',  # installed-ceph  installed-gluster
+        # 'test-rh68-192-168-215-112'            #installed-ceph
     ]
     # domain_list = [
     #     'test-rh68-192-168-215-116',
@@ -152,9 +157,11 @@ def vm_in_90():
     #     'test-rh68-192-168-215-121'
     # ]
     # vm.snapshots_revert(domain_list, 'init')
+    # vm.snapshots_revert(domain_list, 'installed-ceph')
     # vm.create_same_snapshot_name(domain_list, 'installed-ceph')
-    vm.domains_start(domain_list)
-
+    # vm.create_same_snapshot_name(domain_list, 'installed-gluster')
+    # vm.domains_start(domain_list)
+    vm.delete_snapshot_in_domains(domain_list, 'installed-glusters')
 
 if __name__ == "__main__":
     # vm = VirshManage()
