@@ -30,6 +30,10 @@ class VirshManage(object):
                     if self.domain_state(domain) == 'shut off':
                         return True
 
+    def domains_shutdown(self, domain_list, wait_result=False):
+        for item in domain_list:
+            self.domain_shutdown(item, wait_result)
+
     def domain_destroy(self, domain):
         res = self.subprocess_popen(["virsh", "destroy", str(domain)])
         if res[0] == 0 or 'domain is not running' in res[2]:
