@@ -9,7 +9,7 @@ class VirshManage(object):
         pass
 
     @classmethod
-    def subprocess_popen(self, cmd_list):
+    def subprocess_popen(cls, cmd_list):
         p = subprocess.Popen(cmd_list, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
@@ -167,6 +167,25 @@ def vm_in_90():
     # vm.domains_start(domain_list)
     vm.delete_snapshot_in_domains(domain_list, 'installed-glusters')
 
+
+def vm_in_77():
+    vm = VirshManage()
+    domain_list = [
+        'test-rh68-192-168-215-10',
+        'test-rh68-192-168-215-21',
+        'test-rh68-192-168-215-22',
+        'test-rh68-192-168-215-23',
+        'test-rh68-192-168-215-24',
+        'test-rh68-192-168-215-25',
+    ]
+    # vm.snapshots_revert(domain_list, 'init')
+    # vm.snapshots_revert(domain_list, 'installed-ceph')
+    # vm.create_same_snapshot_name(domain_list, 'installed-ceph')
+    # vm.create_same_snapshot_name(domain_list, 'installed-gluster')
+    # vm.domains_start(domain_list)
+    #vm.delete_snapshot_in_domains(domain_list, 'installed-glusters')
+
+
 if __name__ == "__main__":
     # vm = VirshManage()
     # domain_list = ['test-rh68-192-168-215-10','test-rh68-192-168-215-21',
@@ -176,4 +195,5 @@ if __name__ == "__main__":
     #     vm.delete_domain(a)
     # vm.create_same_snapshot_name(domain_list, 'init')
     # vm.snapshots_revert(domain_list, 'init')
-    vm_in_90()
+    #vm_in_90()
+    vm_in_77()
