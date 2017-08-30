@@ -5,3 +5,6 @@ utility.py:
 
 virsh_manage.py:
 利用virsh命令管理虚拟机的接口
+
+ocata-all-in-one.sh
+kolla-ansible 安装部署openstack ocata版本的命令脚本
