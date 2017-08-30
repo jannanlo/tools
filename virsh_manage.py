@@ -105,10 +105,12 @@ class VirshManage(object):
             return True
         return False
 
-    def create_same_snapshot_name(self, domain_list, snapshot_name):
+    def create_same_snapshot_name(self, domain_list, snapshot_name, running=False):
         for item in domain_list:
             if self.domain_shutdown(item, True):
                 self.create_snapshot(item, snapshot_name)
+                if running:
+                    self.domain_start(item)
 
     def snapshot_revert(self, domain, snapshot_name, running=True):
         cmds = ["virsh", "snapshot-revert", str(domain), str(snapshot_name)]
@@ -134,6 +136,10 @@ class VirshManage(object):
             if self.domain_undefine(domain) and domain_blocks:
                 self.rm_domain_blocks(domain_blocks)
             print '=' * 10, 'Deleted: ', domain, domain, '=' * 10
+
+    def delete_domains(self, domain_list):
+        for a in domain_list:
+            self.delete_domain(a)
 
     def delete_snapshot_in_domains(self, domain_list, snapshot_name):
         for item in domain_list:
@@ -171,19 +177,32 @@ def vm_in_90():
 def vm_in_77():
     vm = VirshManage()
     domain_list = [
-        'test-rh68-192-168-215-10',
-        'test-rh68-192-168-215-21',
-        'test-rh68-192-168-215-22',
-        'test-rh68-192-168-215-23',
-        'test-rh68-192-168-215-24',
-        'test-rh68-192-168-215-25',
+       # 'test-rh68-192-168-215-10',    #installed-ceph
+       # 'test-rh68-192-168-215-21',    #installed-ceph
+       # 'test-rh68-192-168-215-22',    #installed-ceph
+       # 'test-rh68-192-168-215-23',
+       # 'test-rh68-192-168-215-24',
+       # 'test-rh68-192-168-215-25',
+
+       # 'test-centos73-192-168-215-201',  #ocata-all-in-one
+
+        'centos73-ocata-192-168-215-202',
+        'centos73-ocata-192-168-215-203',
+        'centos73-ocata-192-168-215-204',
+        'centos73-ocata-192-168-215-205',
     ]
-    # vm.snapshots_revert(domain_list, 'init')
+    #vm.snapshots_revert(domain_list, 'init')
     # vm.snapshots_revert(domain_list, 'installed-ceph')
-    # vm.create_same_snapshot_name(domain_list, 'installed-ceph')
-    # vm.create_same_snapshot_name(domain_list, 'installed-gluster')
-    # vm.domains_start(domain_list)
+    #vm.create_same_snapshot_name(domain_list, 'init')
+    #vm.create_same_snapshot_name(domain_list, 'ocata-all-in-one')
+    #vm.create_same_snapshot_name(domain_list, 'installed-ceph')
+    #vm.create_same_snapshot_name(domain_list, 'installed-gluster')
+    vm.domains_start(domain_list)
+    #vm.domains_shutdown(domain_list)
+    #vm.delete_snapshot_in_domains(domain_list, 'init')
     #vm.delete_snapshot_in_domains(domain_list, 'installed-glusters')
+    #vm.delete_domains(domain_list)
+
 
 
 if __name__ == "__main__":
