@@ -2,6 +2,7 @@
 # Author: Jenner.Luo
 import subprocess
 import re
+import os
 
 
 class VirshManage(object):
@@ -84,6 +85,11 @@ class VirshManage(object):
             res = self.subprocess_popen(["rm", "-f", str(new_item[1])])
             if res[0] == 0:
                 print "Removed: ", " ".join(new_item)
+            xml_file = str(new_item[1]).replace("disk", "xml")
+            if os.path.exists(xml_file):
+                rs = self.subprocess_popen(["rm", "-f", xml_file])
+                if rs[0] == 0:
+                    print "Removed: {0}".format(xml_file)
 
     def delete_snapshot(self, domain, snapshot_name):
         res = self.subprocess_popen(["virsh", "snapshot-delete",
@@ -147,86 +153,60 @@ class VirshManage(object):
             print 'delete ', item, ' snapshot ', snapshot_name
             self.delete_snapshot(item, snapshot_name)
 
-    def list_domain_devs(self, domain):
-        res = self.subprocess_popen(["virsh", "domblklist", str(domain)])
-        print res
 
-    def delete_domain_and_block_dev(self, domain):
-        if self.is_domain_exist(domain):
-            if self.domain_undefine(domain):
-                pass
-        else:
-            print "{} not exist!".format(domain)
-
-
-
-def vm_in_90():
+def run_in_vm():
     vm = VirshManage()
     domain_list = [
-        #    'test-rh68-192-168-215-103',
-        #    'test-rh68-192-168-215-104',
-        #    'test-rh68-192-168-215-105',
-        #    'test-rh68-192-168-215-106',
-        'test-rh68-192-168-215-110',  # installed-ceph   installed-gluster
-        'test-rh68-192-168-215-111',  # installed-ceph  installed-gluster
-        # 'test-rh68-192-168-215-112'            #installed-ceph
-    ]
-    # domain_list = [
-    #     'test-rh68-192-168-215-116',
-    #     'test-rh68-192-168-215-117',
-    #     'test-rh68-192-168-215-118',
-    #     'test-rh68-192-168-215-119',
-    #     'test-rh68-192-168-215-120',
-    #     'test-rh68-192-168-215-121'
-    # ]
-    # vm.snapshots_revert(domain_list, 'init')
-    # vm.snapshots_revert(domain_list, 'installed-ceph')
-    # vm.create_same_snapshot_name(domain_list, 'installed-ceph')
-    # vm.create_same_snapshot_name(domain_list, 'installed-gluster')
-    # vm.domains_start(domain_list)
-    vm.delete_snapshot_in_domains(domain_list, 'installed-glusters')
-
-
-def vm_in_77():
-    vm = VirshManage()
-    domain_list = [
-        # 'test-rh68-192-168-215-10',    #installed-ceph
-        # 'test-rh68-192-168-215-21',    #installed-ceph
-        # 'test-rh68-192-168-215-22',    #installed-ceph
-        # 'test-rh68-192-168-215-23',
-        # 'test-rh68-192-168-215-24',
-        # 'test-rh68-192-168-215-25',
-
         # 'test-centos73-192-168-215-201',  #ocata-all-in-one
 
         # 'centos73-ocata-192-168-215-202',
         # 'centos73-ocata-192-168-215-203',
         # 'centos73-ocata-192-168-215-204',
         # 'centos73-ocata-192-168-215-205',
-        "test-rh68-192-168-215-21"
+        #
+        # "centos73-ocata-192-168-215-7",
+        # "centos73-ocata-192-168-215-8",
+        # "centos73-ocata-192-168-215-9",
+
     ]
     #vm.snapshots_revert(domain_list, 'init')
-    # vm.snapshots_revert(domain_list, 'installed-ceph')
+    #vm.snapshots_revert(domain_list, 'installed-ceph')
     #vm.create_same_snapshot_name(domain_list, 'init')
     #vm.create_same_snapshot_name(domain_list, 'ocata-all-in-one')
     #vm.create_same_snapshot_name(domain_list, 'installed-ceph')
     #vm.create_same_snapshot_name(domain_list, 'installed-gluster')
-    # vm.domains_start(domain_list)
-    # vm.domains_shutdown(domain_list)
+    #vm.domains_start(domain_list)
+    #vm.domains_shutdown(domain_list)
     #vm.delete_snapshot_in_domains(domain_list, 'init')
     #vm.delete_snapshot_in_domains(domain_list, 'installed-glusters')
-    # vm.delete_domains(domain_list)
-    vm.list_domain_devs(domain_list[0])
+    vm.delete_domains(domain_list)
+
+
+# Example:
+#     Usage1:
+#     vm = VirshManage()
+#     domain_list = [
+#         "centos73-ocata-192-168-215-7",
+#         "centos73-ocata-192-168-215-8",
+#         "centos73-ocata-192-168-215-9",
+#     ]
+#     vm.domains_start(domain_list)
+#     Result:
+#     Domain centos73-ocata-192-168-215-7 started
+#     Domain centos73-ocata-192-168-215-8 started
+#     Domain centos73-ocata-192-168-215-9 started
+
+# Usage2:
+# vm = VirshManage()
+# domain_list = ["test-rh68-192-168-215-24"]
+# Result:
+# ========== Deleting:  test-rh68-192-168-215-24 ==========
+# Deleted:  init 2017-08-08 16:07:10 +0800 shutoff
+# Removed:  vda /data/vhosts/lzn/vmdir/test-rh68-192-168-215-24.disk
+# Removed: /data/vhosts/lzn/vmdir/test-rh68-192-168-215-24.xml
+# Removed:  vdb /data/vhosts/lzn/vmdir/test-rh68-192-168-215-24-data1.disk
+# ======== Deleted:  test-rh68-192-168-215-24 test-rh68-192-168-215-24 ========
 
 
 if __name__ == "__main__":
-    # vm = VirshManage()
-    # domain_list = ['test-rh68-192-168-215-10','test-rh68-192-168-215-21',
-    #                'test-rh68-192-168-215-22','test-rh68-192-168-215-23',
-    #                'test-rh68-192-168-215-24', 'test-rh68-192-168-215-25']
-    # for a in domain_list:
-    #     vm.delete_domain(a)
-    # vm.create_same_snapshot_name(domain_list, 'init')
-    # vm.snapshots_revert(domain_list, 'init')
-    # vm_in_90()
-    vm_in_77()
+    run_in_vm()
