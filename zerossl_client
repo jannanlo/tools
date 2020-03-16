@@ -1,0 +1,4 @@
+#!/bin/bash
+
+#https://hub.docker.com/r/zerossl/client/
+#docker run -it -v /data/zerossl_dir/keys_and_certs:/data -v /data/zerossl_dir/public_html/.well-known/acme-challenge:/webroot -u $(id -u) --rm zerossl/client $*
