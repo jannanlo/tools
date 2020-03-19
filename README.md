@@ -19,7 +19,8 @@ mysql-opertaion.sh 脚本里封装了几个方法
 
 命令 |   调用的方法  |   说明
 ------------ | ------------- | -------------
-bash mysql-opertaion.sh check-db-talbes-size dbName userName password | check-db-talbes-size [args] |  查看dbName数据库各表容量大小
-bash mysql-opertaion.sh check-db-talbe-size tbName dbName userName password | check-db-talbe-size [args] |  查看dbName数据库的tbName表容量大小
 bash mysql-opertaion.sh check-dbs-size userName password | check-dbs-size [args] |  查看所有数据库容量大小
 bash mysql-opertaion.sh check-dbs-talbes-size userName password | check-dbs-talbes-size [args] |  查看所有数据库各表容量大小
+bash mysql-opertaion.sh check-db-size dbName userName password | check-db-size [args] |  查看指定数据库dbName容量大小
+bash mysql-opertaion.sh check-db-talbes-size dbName userName password | check-db-talbes-size [args] |  查看指定数据库dbName各表容量大小
+bash mysql-opertaion.sh check-db-talbe-size tbName dbName userName password | check-db-talbe-size [args] |  查看dbName数据库的tbName表容量大小
