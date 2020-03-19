@@ -74,7 +74,16 @@ WHERE table_schema="'${db}'"
 AND table_name="'${tb}'";
 '''
 }
-
+optimize-db-table(){
+  local tb=${1:-"tableName"}
+  local db=${2:-"dbName"}
+  local user=${3:-"userName"}
+  local paswd=${4:-"password"}
+mysql -uroot -ptcl-Db1@tcl.com -e '''
+use '${db}';
+optimize table '${tb}';
+'''
+}
 main(){
   $*
 }
