@@ -1,4 +1,4 @@
-# tools 此项集成了各类脚本工具
+# tools 此项目集成了各类脚本工具
 
 ## [utility.py](/utility.py)
 用python实现的一些常用的工具方法
