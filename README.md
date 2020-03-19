@@ -12,7 +12,7 @@ kolla-ansible 安装部署openstack ocata版本的命令脚本
 ## [mon_scripts.sh](mon_scripts.sh)
 此脚本用户监控服务负载，保存服务器高负载时的状况快照
 
-## [mysql-opertaion.sh](mysql-opertaion.s)
+## [mysql-opertaion.sh](mysql-opertaion.sh)
 在mysql shell中执行sql语句
 ### bash mysql-opertaion.sh [args] 命令的使用
 mysql-opertaion.sh 脚本里封装了几个方法
@@ -21,3 +21,4 @@ mysql-opertaion.sh 脚本里封装了几个方法
 ------------ | ------------- | -------------
 bash mysql-opertaion.sh check-db-talbes-size dbName userName password | check-db-talbes-size [args] |  查看dbName数据库各表容量大小
 bash mysql-opertaion.sh check-db-talbe-size tbName dbName userName password | check-db-talbe-size [args] |  查看dbName数据库的tbName表容量大小
+bash mysql-opertaion.sh check-dbs-size userName password | check-dbs-size [args] |  查看所有数据库容量大小
