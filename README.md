@@ -22,3 +22,4 @@ mysql-opertaion.sh 脚本里封装了几个方法
 bash mysql-opertaion.sh check-db-talbes-size dbName userName password | check-db-talbes-size [args] |  查看dbName数据库各表容量大小
 bash mysql-opertaion.sh check-db-talbe-size tbName dbName userName password | check-db-talbe-size [args] |  查看dbName数据库的tbName表容量大小
 bash mysql-opertaion.sh check-dbs-size userName password | check-dbs-size [args] |  查看所有数据库容量大小
+bash mysql-opertaion.sh check-dbs-talbes-size userName password | check-dbs-talbes-size [args] |  查看所有数据库各表容量大小
