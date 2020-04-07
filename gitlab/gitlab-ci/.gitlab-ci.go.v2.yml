@@ -1,0 +1,94 @@
+variables:
+  PROJECT_NAME: myFunction
+  GIT_CLONE_PATH: ${CI_BUILDS_DIR}/src/$PROJECT_NAME
+  REGISTRY: registry.mydomain.com
+  NAMESPACE: namespace
+  IMAGE: $NAMESPACE/$PROJECT_NAME
+  TAG: $CI_COMMIT_REF_NAME
+  GO_BIN: $PROJECT_NAME-main
+
+stages:
+  - go-check
+  - go-test
+  - go-build
+  - deploy
+
+go-report-card:
+  variables:
+    GRADE_THRESHOLD: 90
+    REPORT_BASE_NAME: $PROJECT_NAME-go-report-card
+  image: jenner/goreportcard-cli
+  stage: go-check
+  artifacts:
+    name:  "$REPORT_BASE_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - $REPORT_BASE_NAME
+    when: always
+  script:
+    - export GOPATH=$CI_BUILDS_DIR && export CGO_ENABLED=0 && export GOOS=linux  
+    - goreportcard-cli -v >  $REPORT_BASE_NAME
+    - cat $REPORT_BASE_NAME
+    - grade=$(grep "Grade:"  $REPORT_BASE_NAME |cut -d '(' -f2|cut -d '%' -f1)
+    - if [ $(echo "$grade>$GRADE_THRESHOLD"|bc) -ne 1 ]; then echo "GO CHECK FAILED BECAUSE GRADE BELOW $GRADE_THRESHOLD . " && exit 1; fi;
+  only:
+    refs:
+      - branches
+    changes:
+      - "*.go"
+
+go-test:
+  image: ${REGISTRY}/library/golang:alpine3.10
+  stage: go-test
+  script:
+    - export GOPATH=$CI_BUILDS_DIR && export CGO_ENABLED=0 && export GOOS=linux 
+    - go test .
+  only:
+    refs:
+      - branches
+    changes:
+      - "*.go"
+
+go-build:    
+  image: ${REGISTRY}/library/golang:alpine3.10
+  stage: go-build
+  artifacts:
+    name:  "$CI_COMMIT_REF_NAME-$PROJECT_NAME-main"
+    paths:
+      - $GO_BIN
+  script:
+    - export GOPATH=$CI_BUILDS_DIR && export CGO_ENABLED=0 && export GOOS=linux  
+    - go build -a -installsuffix cgo -o $GO_BIN .
+  only:
+    refs:
+      - branches
+    changes:
+      - "*.go"
+
+aws-deploy:
+  variables:
+    S3_BUCKET: my-function
+    WEBSITE_S3_PREFIX: https://s3-eu-central-1.amazonaws.com/$S3_BUCKET
+    CODE_ZIP: $CI_COMMIT_REF_NAME-$PROJECT_NAME-main.zip
+  image: jenner/awscli
+  stage: deploy
+  dependencies:
+    - go-build
+  script:
+    - mkdir -p /root/.aws
+    - cp -rf ./aws-configure/* /root/.aws/   #current project must have aws-configure diretory which have config file and credentials file.
+    - zip $CODE_ZIP $GO_BIN
+    - aws cloudformation validate-template --template-body file://lambda.template.yml
+    - aws s3api put-object --bucket $S3_BUCKET --body $CODE_ZIP --key $CODE_ZIP
+    - aws cloudformation deploy --template-file lambda.template.yml --stack-name $PROJECT_NAME --parameter-overrides ProjectId=$PROJECT_NAME Stage=Alpha S3Key=$CODE_ZIP
+  artifacts:
+    name:  "$CI_COMMIT_REF_NAME-$PROJECT_NAME"
+    paths:
+      - template-export.yml
+  only:
+    refs:
+      - branches
+    changes:
+      - "*.go"
+      - ".gitlab-ci.yml"
+      - "template-export.yml"
+      - "lambda.template.yml"
